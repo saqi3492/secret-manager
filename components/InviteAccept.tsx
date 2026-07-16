@@ -12,6 +12,17 @@ interface InviteInfo {
   projectName?: string;
 }
 
+// Defined at module scope (not inside the component) so it keeps a stable
+// component identity across renders — otherwise React remounts its subtree on
+// every keystroke and the focused input loses focus.
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mx-auto mt-24 w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+      {children}
+    </div>
+  );
+}
+
 export default function InviteAccept({
   token,
   loggedIn,
@@ -71,12 +82,6 @@ export default function InviteAccept({
       setBusy(false);
     }
   }
-
-  const Card = ({ children }: { children: React.ReactNode }) => (
-    <div className="mx-auto mt-24 w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-      {children}
-    </div>
-  );
 
   if (!info) {
     return <Card>Loading invitation…</Card>;
