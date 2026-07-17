@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { type Role } from "@/lib/authz";
+import { type Role, accessibleEnvironmentIds } from "@/lib/authz";
 import Header from "@/components/Header";
 import ProjectView from "@/components/ProjectView";
 
@@ -27,6 +27,13 @@ export default async function ProjectPage({
   if (!membership) notFound();
 
   const { project } = membership;
+  const role = membership.role as Role;
+
+  // Only surface environments this user is allowed to see.
+  const allowed = await accessibleEnvironmentIds(session.userId, project.id, role);
+  const visibleEnvironments = project.environments.filter((e) =>
+    allowed.has(e.id)
+  );
 
   return (
     <div>
@@ -41,8 +48,8 @@ export default async function ProjectPage({
         <ProjectView
           projectId={project.id}
           projectName={project.name}
-          role={membership.role as Role}
-          initialEnvironments={project.environments.map((e) => ({
+          role={role}
+          initialEnvironments={visibleEnvironments.map((e) => ({
             id: e.id,
             name: e.name,
           }))}

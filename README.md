@@ -14,6 +14,8 @@ See [PRD.md](./PRD.md) for the full product spec.
 - Secrets CRUD with masked values, reveal, and copy-to-clipboard.
 - **Import** by pasting a `.env` file; **export** an environment back to a `.env` file.
 - Members with **owner / editor / viewer** roles, enforced on both the API and the UI.
+- **Per-environment access:** each editor/viewer is granted access to specific
+  environments only — they can't even see the environments they weren't given.
 - Secret values are **encrypted at rest** (AES-256-GCM) — the database never stores plaintext.
 
 ## Tech stack
@@ -95,15 +97,22 @@ add it under the project's **Domains** tab in Vercel.
 **Note on invite links:** once deployed, invite links use your real domain
 automatically, so teammates on any machine can open them.
 
-## Roles
+## Roles & access
+
+Editors and viewers only act within the **environments they've been granted**.
+Owners have access to every environment automatically.
 
 | Action | Owner | Editor | Viewer |
 |--------|:-----:|:------:|:------:|
-| View / export secrets | ✅ | ✅ | ✅ |
-| Add / edit / delete secrets | ✅ | ✅ | ❌ |
-| Add / remove environments | ✅ | ✅ | ❌ |
-| Invite / remove members, set roles | ✅ | ❌ | ❌ |
+| View / export secrets (in granted environments) | ✅ (all) | ✅ | ✅ |
+| Add / edit / delete secrets (in granted environments) | ✅ (all) | ✅ | ❌ |
+| See an environment | all | only granted | only granted |
+| Add / remove / rename environments | ✅ | ❌ | ❌ |
+| Invite / remove members, set roles & environment access | ✅ | ❌ | ❌ |
 | Delete project | ✅ | ❌ | ❌ |
+
+When inviting someone (or later, per member), the owner picks exactly which
+environments that person can access.
 
 ## Known limitations (v1)
 

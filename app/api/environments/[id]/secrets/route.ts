@@ -1,19 +1,17 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { handle, json, error, requireSession } from "@/lib/api";
-import { requireRole, projectIdForEnvironment } from "@/lib/authz";
+import { requireEnvironmentAccess } from "@/lib/authz";
 import { encrypt, decrypt } from "@/lib/crypto";
 
 type Params = { params: Promise<{ id: string }> };
 
-// GET /api/environments/[id]/secrets — decrypted key/value list (viewer+).
+// GET /api/environments/[id]/secrets — decrypted key/value list (viewer+ with access).
 export async function GET(_req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForEnvironment(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "viewer");
+    await requireEnvironmentAccess(session.userId, id, "viewer");
 
     const secrets = await prisma.secret.findMany({
       where: { environmentId: id },
@@ -40,14 +38,12 @@ const createSchema = z.object({
   value: z.string(),
 });
 
-// POST /api/environments/[id]/secrets — create one secret (editor+).
+// POST /api/environments/[id]/secrets — create one secret (editor+ with access).
 export async function POST(req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForEnvironment(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    await requireEnvironmentAccess(session.userId, id, "editor");
 
     const body = createSchema.parse(await req.json());
     const existing = await prisma.secret.findUnique({

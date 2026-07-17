@@ -1,19 +1,26 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { handle, json, error, requireSession } from "@/lib/api";
-import { requireRole } from "@/lib/authz";
+import { requireRole, accessibleEnvironmentIds, type Role } from "@/lib/authz";
 
 type Params = { params: Promise<{ id: string }> };
 
-// GET /api/projects/[id]/environments — list environments (any member).
+// GET /api/projects/[id]/environments — list environments the caller can access.
+// Owners see all; editors/viewers see only their granted environments.
 export async function GET(_req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    await requireRole(session.userId, id, "viewer");
+    const membership = await requireRole(session.userId, id, "viewer");
+
+    const allowed = await accessibleEnvironmentIds(
+      session.userId,
+      id,
+      membership.role as Role
+    );
 
     const envs = await prisma.environment.findMany({
-      where: { projectId: id },
+      where: { projectId: id, id: { in: [...allowed] } },
       orderBy: { createdAt: "asc" },
       select: { id: true, name: true },
     });
@@ -29,12 +36,13 @@ const createSchema = z.object({
     .regex(/^[A-Za-z0-9_-]+$/, "Use letters, numbers, dashes or underscores only"),
 });
 
-// POST /api/projects/[id]/environments — editor+.
+// POST /api/projects/[id]/environments — owner only (environment structure is
+// managed by the owner, who also controls per-user access).
 export async function POST(req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    await requireRole(session.userId, id, "editor");
+    await requireRole(session.userId, id, "owner");
     const body = createSchema.parse(await req.json());
 
     const existing = await prisma.environment.findUnique({

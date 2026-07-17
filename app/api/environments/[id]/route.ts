@@ -13,14 +13,14 @@ const patchSchema = z.object({
     .regex(/^[A-Za-z0-9_-]+$/, "Use letters, numbers, dashes or underscores only"),
 });
 
-// PATCH /api/environments/[id] — rename (editor+).
+// PATCH /api/environments/[id] — rename (owner only).
 export async function PATCH(req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
     const projectId = await projectIdForEnvironment(id);
     if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    await requireRole(session.userId, projectId, "owner");
 
     const body = patchSchema.parse(await req.json());
     const env = await prisma.environment.update({
@@ -32,14 +32,14 @@ export async function PATCH(req: Request, { params }: Params) {
   });
 }
 
-// DELETE /api/environments/[id] — editor+. Cascades to its secrets.
+// DELETE /api/environments/[id] — owner only. Cascades to its secrets.
 export async function DELETE(_req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
     const projectId = await projectIdForEnvironment(id);
     if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    await requireRole(session.userId, projectId, "owner");
 
     // Refuse to delete the last environment in a project.
     const count = await prisma.environment.count({ where: { projectId } });

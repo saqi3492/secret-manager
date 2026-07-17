@@ -127,7 +127,7 @@ export default function ProjectView({
                 >
                   {env.name}
                 </button>
-                {canEdit && envs.length > 1 && (
+                {isOwner && envs.length > 1 && (
                   <button
                     onClick={() => deleteEnv(env.id)}
                     title="Delete environment"
@@ -139,7 +139,7 @@ export default function ProjectView({
               </div>
             ))}
 
-            {canEdit &&
+            {isOwner &&
               (addingEnv ? (
                 <form onSubmit={addEnv} className="flex items-center gap-1">
                   <input
@@ -187,7 +187,11 @@ export default function ProjectView({
               />
             </>
           ) : (
-            <p className="text-slate-500">No environments.</p>
+            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+              {isOwner
+                ? "No environments yet. Add one to get started."
+                : "You don't have access to any environments in this project yet. Ask a project owner to grant you access."}
+            </div>
           )}
         </>
       )}

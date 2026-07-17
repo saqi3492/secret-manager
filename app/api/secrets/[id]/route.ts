@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { handle, json, error, requireSession } from "@/lib/api";
-import { requireRole, projectIdForSecret } from "@/lib/authz";
+import { requireEnvironmentAccess, environmentIdForSecret } from "@/lib/authz";
 import { encrypt } from "@/lib/crypto";
 
 type Params = { params: Promise<{ id: string }> };
@@ -21,9 +21,9 @@ export async function PATCH(req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForSecret(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    const environmentId = await environmentIdForSecret(id);
+    if (!environmentId) return error("Not found", 404);
+    await requireEnvironmentAccess(session.userId, environmentId, "editor");
 
     const body = patchSchema.parse(await req.json());
     const data: Record<string, string> = {};
@@ -44,9 +44,9 @@ export async function DELETE(_req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForSecret(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    const environmentId = await environmentIdForSecret(id);
+    if (!environmentId) return error("Not found", 404);
+    await requireEnvironmentAccess(session.userId, environmentId, "editor");
 
     await prisma.secret.delete({ where: { id } });
     return json({ ok: true });

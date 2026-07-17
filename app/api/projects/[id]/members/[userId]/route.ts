@@ -39,6 +39,11 @@ export async function DELETE(_req: Request, { params }: Params) {
 
     await ensureNotLastOwner(id, userId);
 
+    // Remove their per-environment access in this project as well, so a future
+    // re-invite starts from a clean slate.
+    await prisma.environmentAccess.deleteMany({
+      where: { userId, environment: { projectId: id } },
+    });
     await prisma.membership.delete({
       where: { userId_projectId: { userId, projectId: id } },
     });

@@ -24,6 +24,21 @@ export async function POST(_req: Request, { params }: Params) {
       });
     }
 
+    // Grant access to the invited environments that still exist in the project.
+    const envs = await prisma.environment.findMany({
+      where: { projectId: inv.projectId, id: { in: inv.environmentIds } },
+      select: { id: true },
+    });
+    for (const e of envs) {
+      await prisma.environmentAccess.upsert({
+        where: {
+          userId_environmentId: { userId: session.userId, environmentId: e.id },
+        },
+        update: {},
+        create: { userId: session.userId, environmentId: e.id },
+      });
+    }
+
     await prisma.invitation.update({
       where: { token },
       data: { acceptedAt: new Date() },

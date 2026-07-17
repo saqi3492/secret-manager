@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(cuid())
-  email        String       @unique
-  name         String
-  passwordHash String? // null = placeholder user (invited but not yet signed up)
-  createdAt    DateTime     @default(now())
-  memberships  Membership[]
+  id                String              @id @default(cuid())
+  email             String              @unique
+  name              String
+  passwordHash      String? // null = placeholder user (invited but not yet signed up)
+  createdAt         DateTime            @default(now())
+  memberships       Membership[]
+  environmentAccess EnvironmentAccess[]
 }
 
 model Project {
@@ -33,6 +34,8 @@ model Invitation {
   token      String    @unique
   email      String
   role       String // "editor" | "viewer"
+  // Environment ids to grant access to when the invite is accepted.
+  environmentIds String[] @default([])
   createdAt  DateTime  @default(now())
   acceptedAt DateTime?
   project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -55,14 +58,29 @@ model Membership {
 }
 
 model Environment {
-  id        String   @id @default(cuid())
+  id        String              @id @default(cuid())
   name      String
-  createdAt DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime            @default(now())
+  project   Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
   secrets   Secret[]
+  access    EnvironmentAccess[]
 
   @@unique([projectId, name])
+}
+
+// Grants a (non-owner) user access to a specific environment. Owners implicitly
+// have access to every environment in their project and need no rows here.
+model EnvironmentAccess {
+  id            String      @id @default(cuid())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  environmentId String
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, environmentId])
+  @@index([environmentId])
 }
 
 model Secret {
