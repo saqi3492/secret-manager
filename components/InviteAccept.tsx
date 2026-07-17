@@ -10,6 +10,7 @@ interface InviteInfo {
   email?: string;
   role?: string;
   projectName?: string;
+  environmentNames?: string[];
 }
 
 // Defined at module scope (not inside the component) so it keeps a stable
@@ -124,6 +125,14 @@ export default function InviteAccept({
         <span className="font-medium text-slate-900">{info.projectName}</span> as{" "}
         <span className="font-medium capitalize text-slate-900">{info.role}</span>.
       </p>
+      {info.environmentNames && info.environmentNames.length > 0 && (
+        <p className="mt-1 text-sm text-slate-600">
+          Environments:{" "}
+          <span className="font-medium text-slate-900">
+            {info.environmentNames.join(", ")}
+          </span>
+        </p>
+      )}
     </>
   );
 

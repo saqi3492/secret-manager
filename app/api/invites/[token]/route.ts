@@ -14,12 +14,20 @@ export async function GET(_req: Request, { params }: Params) {
     });
 
     if (!inv) return json({ valid: false, accepted: false });
+
+    const envs = await prisma.environment.findMany({
+      where: { projectId: inv.projectId, id: { in: inv.environmentIds } },
+      select: { name: true },
+      orderBy: { createdAt: "asc" },
+    });
+
     return json({
       valid: true,
       accepted: inv.acceptedAt !== null,
       email: inv.email,
       role: inv.role,
       projectName: inv.project.name,
+      environmentNames: envs.map((e) => e.name),
     });
   });
 }

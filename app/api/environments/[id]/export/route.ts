@@ -1,19 +1,17 @@
 import { prisma } from "@/lib/db";
 import { handle, error, requireSession } from "@/lib/api";
-import { requireRole, projectIdForEnvironment } from "@/lib/authz";
+import { requireEnvironmentAccess } from "@/lib/authz";
 import { decrypt } from "@/lib/crypto";
 import { formatEnv } from "@/lib/env-format";
 
 type Params = { params: Promise<{ id: string }> };
 
-// GET /api/environments/[id]/export — return the environment as .env text (viewer+).
+// GET /api/environments/[id]/export — return the environment as .env text (viewer+ with access).
 export async function GET(_req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForEnvironment(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "viewer");
+    await requireEnvironmentAccess(session.userId, id, "viewer");
 
     const env = await prisma.environment.findUnique({
       where: { id },

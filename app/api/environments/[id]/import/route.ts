@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { handle, json, error, requireSession } from "@/lib/api";
-import { requireRole, projectIdForEnvironment } from "@/lib/authz";
+import { requireEnvironmentAccess } from "@/lib/authz";
 import { encrypt } from "@/lib/crypto";
 import { parseEnv } from "@/lib/env-format";
 
@@ -18,9 +18,7 @@ export async function POST(req: Request, { params }: Params) {
   return handle(async () => {
     const session = await requireSession();
     const { id } = await params;
-    const projectId = await projectIdForEnvironment(id);
-    if (!projectId) return error("Not found", 404);
-    await requireRole(session.userId, projectId, "editor");
+    await requireEnvironmentAccess(session.userId, id, "editor");
 
     const body = schema.parse(await req.json());
     const pairs = parseEnv(body.content);
