@@ -30,6 +30,10 @@ export default function NewProjectButton() {
       setName("");
       setDescription("");
       router.push(`/projects/${data.id}`);
+      // Invalidate the client Router Cache so the dashboard re-fetches its
+      // project list. Without this, navigating back shows a stale dashboard
+      // that's missing the just-created project until a full page refresh.
+      router.refresh();
     } finally {
       setLoading(false);
     }
