@@ -41,7 +41,7 @@ export default async function ProjectPage({
       <main className="mx-auto max-w-5xl px-6 py-8">
         <Link
           href="/dashboard"
-          className="text-sm text-slate-500 hover:text-slate-900"
+          className="text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
         >
           ← All projects
         </Link>

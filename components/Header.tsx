@@ -13,16 +13,16 @@ export default function Header({ name }: { name: string }) {
   }
 
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link href="/dashboard" className="font-semibold">
           🔒 Secret Manager
         </Link>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-slate-500">{name}</span>
+          <span className="text-slate-500 dark:text-slate-400">{name}</span>
           <button
             onClick={logout}
-            className="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50"
+            className="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
           >
             Log out
           </button>

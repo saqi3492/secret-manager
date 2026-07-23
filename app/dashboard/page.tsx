@@ -31,7 +31,7 @@ export default async function DashboardPage() {
         </div>
 
         {memberships.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
+          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
             No projects yet. Create your first project to start storing secrets.
           </div>
         ) : (
@@ -40,20 +40,20 @@ export default async function DashboardPage() {
               <li key={m.project.id}>
                 <Link
                   href={`/projects/${m.project.id}`}
-                  className="block rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-400"
+                  className="block rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-600"
                 >
                   <div className="flex items-center justify-between">
                     <h2 className="font-medium">{m.project.name}</h2>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs capitalize text-slate-600">
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs capitalize text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       {m.role}
                     </span>
                   </div>
                   {m.project.description && (
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                       {m.project.description}
                     </p>
                   )}
-                  <p className="mt-3 text-xs text-slate-400">
+                  <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
                     {m.project._count.environments} environment
                     {m.project._count.environments !== 1 ? "s" : ""} ·{" "}
                     {m.project._count.memberships} member

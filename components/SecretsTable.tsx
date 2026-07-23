@@ -91,20 +91,20 @@ export default function SecretsTable({
   }
 
   if (loading) {
-    return <p className="py-8 text-center text-slate-400">Loading secrets…</p>;
+    return <p className="py-8 text-center text-slate-400 dark:text-slate-500">Loading secrets…</p>;
   }
 
   return (
     <div>
       {secrets.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
           No secrets in this environment yet.
           {canEdit && " Add one below or import a .env file."}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-4 py-2 font-medium">Key</th>
                 <th className="px-4 py-2 font-medium">Value</th>
@@ -133,29 +133,29 @@ export default function SecretsTable({
       {canEdit && (
         <form
           onSubmit={addSecret}
-          className="mt-4 flex flex-wrap items-start gap-2 rounded-lg border border-slate-200 bg-white p-3"
+          className="mt-4 flex flex-wrap items-start gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
         >
           <input
             value={newKey}
             onChange={(e) => setNewKey(e.target.value)}
             placeholder="KEY"
             required
-            className="w-48 rounded-md border border-slate-300 px-3 py-2 font-mono text-sm outline-none focus:border-slate-500"
+            className="w-48 rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-400"
           />
           <input
             value={newValue}
             onChange={(e) => setNewValue(e.target.value)}
             placeholder="value"
-            className="min-w-[12rem] flex-1 rounded-md border border-slate-300 px-3 py-2 font-mono text-sm outline-none focus:border-slate-500"
+            className="min-w-[12rem] flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-400"
           />
           <button
             type="submit"
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
           >
             Add secret
           </button>
           {addError && (
-            <p className="w-full text-sm text-red-700">{addError}</p>
+            <p className="w-full text-sm text-red-700 dark:text-red-400">{addError}</p>
           )}
         </form>
       )}
@@ -188,19 +188,19 @@ function SecretRow({
 
   if (editing) {
     return (
-      <tr className="border-b border-slate-100 last:border-0">
+      <tr className="border-b border-slate-100 last:border-0 dark:border-slate-800">
         <td className="px-4 py-2">
           <input
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            className="w-full rounded border border-slate-300 px-2 py-1 font-mono text-sm"
+            className="w-full rounded border border-slate-300 bg-white px-2 py-1 font-mono text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </td>
         <td className="px-4 py-2">
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="w-full rounded border border-slate-300 px-2 py-1 font-mono text-sm"
+            className="w-full rounded border border-slate-300 bg-white px-2 py-1 font-mono text-sm text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </td>
         <td className="whitespace-nowrap px-4 py-2 text-right">
@@ -208,7 +208,7 @@ function SecretRow({
             onClick={async () => {
               if (await onSave(secret.id, key, value)) setEditing(false);
             }}
-            className="mr-2 text-sm font-medium text-slate-900"
+            className="mr-2 text-sm font-medium text-slate-900 dark:text-slate-100"
           >
             Save
           </button>
@@ -218,7 +218,7 @@ function SecretRow({
               setValue(secret.value);
               setEditing(false);
             }}
-            className="text-sm text-slate-500"
+            className="text-sm text-slate-500 dark:text-slate-400"
           >
             Cancel
           </button>
@@ -228,31 +228,31 @@ function SecretRow({
   }
 
   return (
-    <tr className="border-b border-slate-100 last:border-0">
+    <tr className="border-b border-slate-100 last:border-0 dark:border-slate-800">
       <td className="px-4 py-2 font-mono">{secret.key}</td>
-      <td className="px-4 py-2 font-mono text-slate-700">
+      <td className="px-4 py-2 font-mono text-slate-700 dark:text-slate-300">
         <span className="mr-2">
           {revealed ? secret.value : "•".repeat(Math.min(12, secret.value.length || 4))}
         </span>
       </td>
-      <td className="whitespace-nowrap px-4 py-2 text-right text-slate-500">
-        <button onClick={onToggle} className="mr-3 text-sm hover:text-slate-900">
+      <td className="whitespace-nowrap px-4 py-2 text-right text-slate-500 dark:text-slate-400">
+        <button onClick={onToggle} className="mr-3 text-sm hover:text-slate-900 dark:hover:text-slate-100">
           {revealed ? "Hide" : "Reveal"}
         </button>
-        <button onClick={onCopy} className="mr-3 text-sm hover:text-slate-900">
+        <button onClick={onCopy} className="mr-3 text-sm hover:text-slate-900 dark:hover:text-slate-100">
           {copied ? "Copied!" : "Copy"}
         </button>
         {canEdit && (
           <>
             <button
               onClick={() => setEditing(true)}
-              className="mr-3 text-sm hover:text-slate-900"
+              className="mr-3 text-sm hover:text-slate-900 dark:hover:text-slate-100"
             >
               Edit
             </button>
             <button
               onClick={onDelete}
-              className="text-sm text-red-500 hover:text-red-700"
+              className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
               Delete
             </button>
